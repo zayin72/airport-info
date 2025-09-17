@@ -320,5 +320,36 @@
     // init
     fetch("parkingMap.json").then(r=>r.json()).then(pm=>{ parkingMap=pm; autoFetchAll(); }).catch(()=>autoFetchAll());
   </script>
+
+  <!-- ✅ 방문자 카운터 표시 -->
+  <footer style="margin:20px; text-align:center; font-size:14px; color:#333; border-top:1px solid #ddd; padding-top:10px;">
+    오늘 방문: <span id="todayCount">0</span> | 전체 방문: <span id="totalCount">0</span>
+  </footer>
+
+  <!-- ✅ 방문자 카운터 스크립트 -->
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      // 전체 방문 카운트
+      fetch("https://api.countapi.xyz/hit/icn-airport-info/total")
+        .then(res => res.json())
+        .then(data => {
+          const el = document.getElementById("totalCount");
+          if (el) el.innerText = data.value;
+        })
+        .catch(e => console.error("totalCount error:", e));
+
+      // 오늘 날짜별 방문 카운트
+      const todayKey = new Date().toISOString().slice(0,10);
+      fetch("https://api.countapi.xyz/hit/icn-airport-info/" + todayKey)
+        .then(res => res.json())
+        .then(data => {
+          const el = document.getElementById("todayCount");
+          if (el) el.innerText = data.value;
+        })
+        .catch(e => console.error("todayCount error:", e));
+    });
+  </script>
+</body>
+</html>
 </body>
 </html>
