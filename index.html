@@ -1,42 +1,306 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
   <title>인천공항 실시간 도착, 입국장 및 주차장 안내</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --brand:#0b57d0;
+      --bg:#f4f6f9;
+      --card:#fff;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --chip:#f0f0f0;
+    }
+    body {
+      font-family: "Noto Sans KR", Arial, sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: #222;
+    }
 
-  <!-- ✅ SEO -->
-  <meta name="description" content="인천공항 실시간 도착 정보, 입국장 위치, 주차장 안내까지 한눈에 확인하세요.">
-  <meta name="keywords" content="인천공항, 도착, 입국장, 실시간 항공편, 주차장 안내, 공항정보">
-  <meta name="author" content="Incheon Airport Info">
+    /* ===== Header ===== */
+    header {
+      background: url("images/airport_bg.jpg") center/cover no-repeat, #18324e;
+      color: #fff;
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+    header::after {
+      content: "";
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.35);
+    }
+    header h1 {
+      position: relative; z-index: 1;
+      margin: 0;
+      font-size: 1.6rem; /* PC */
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      display: inline-block;
+      background: rgba(0,0,0,0.45);
+      padding: .65rem 1.1rem;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+    header h1 span { display: inline; }
 
-  <!-- ✅ Open Graph (SNS 공유 미리보기) -->
-  <meta property="og:title" content="인천공항 실시간 도착·입국장 안내">
-  <meta property="og:description" content="실시간 항공편 도착 현황, 입국장 위치, 가까운 주차장 정보를 빠르게 확인하세요.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://airport-info.netlify.app">
-  <meta property="og:image" content="https://airport-info.netlify.app/images/airport_bg.jpg">
+    /* ✅ 모바일: 두 줄 */
+    @media (max-width:768px) {
+      header h1 {
+        white-space: normal;
+        line-height: 1.4;
+        text-align: center;
+        font-size: 1.4rem; /* 모바일 크기 살짝 줄임 */
+        padding: .55rem 1rem;
+      }
+      header h1 .title-line1,
+      header h1 .title-line2 {
+        display: block;
+      }
+    }
 
-  <!-- ✅ Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="인천공항 실시간 도착·입국장 안내">
-  <meta name="twitter:description" content="실시간 항공편 도착 현황, 입국장 위치, 가까운 주차장 정보를 빠르게 확인하세요.">
-  <meta name="twitter:image" content="https://airport-info.netlify.app/images/airport_bg.jpg">
+    /* ===== Controls ===== */
+    .controls {
+      display: flex; gap: .6rem; justify-content: center;
+      padding: 1.2rem 1rem;
+    }
+    button {
+      background: var(--brand); color: #fff; border: 0;
+      border-radius: 10px; padding: .7rem 1.1rem;
+      cursor: pointer; font-size: .95rem; font-weight: 700;
+      box-shadow: 0 3px 10px rgba(0,0,0,.12);
+      transition: transform .1s, background .15s;
+    }
+    button:hover { background:#0946a0; transform: translateY(-1px); }
 
-  <!-- ✅ 스타일 (필요 시 유지) -->
-  <link rel="stylesheet" href="css/style.css">
+    .status { text-align: center; font-size: .95rem; margin-bottom: .5rem; }
+    .ok{ color: #2e7d32; } .error{ color: #c62828; }
+
+    .summary {
+      width: 95%; margin: .6rem auto 1rem;
+      text-align:center; font-weight:700; color: var(--brand);
+      background: #e8f0fe; border:1px solid #dce6ff; border-radius: 10px;
+      padding:.6rem .9rem;
+    }
+
+    /* ===== Table (PC) ===== */
+    table {
+      width:95%; margin: 0 auto 2rem; border-collapse: collapse;
+      background: var(--card); border-radius:12px; overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,.07);
+      font-size: .92rem;
+    }
+    thead { background:#eef4ff; }
+    th, td { padding: .85rem .9rem; border-bottom: 1px solid var(--line); }
+    th { color:#1f2a44; font-weight:800; }
+    tbody tr:nth-child(even){ background:#fafafa; }
+    tbody tr:hover{ background:#f6faff; }
+    .time { font-variant-numeric: tabular-nums; }
+    .sub { color: var(--muted); font-size: .82rem; }
+    .logo { height: 20px; vertical-align: middle; margin: 0 6px; }
+
+    /* ===== Mobile Cards ===== */
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr { display:block; }
+      thead { display:none; }
+
+      tbody tr {
+        background: var(--card);
+        border-radius: 12px;
+        margin: 1rem; padding: 0;
+        box-shadow: 0 3px 10px rgba(0,0,0,.08);
+        overflow: hidden;
+      }
+
+      td {
+        display:flex; align-items:center; gap:.5rem;
+        padding: .65rem 1rem; border:none; text-align:left;
+        font-size: .9rem;
+      }
+      td::before {
+        content:""; flex-shrink:0; width: 92px;
+        color: var(--brand); font-weight:800;
+      }
+
+      /* 카드 상단 */
+      td:nth-of-type(1) {
+        background: var(--chip);
+        border-bottom: 1px solid #ddd;
+        padding: 1rem; gap: .6rem;
+        font-size: 1.2rem; font-weight:800; color:#222;
+        justify-content:flex-start; flex-wrap:wrap;
+      }
+      td:nth-of-type(1)::before { content:none; width:0; }
+
+      td:nth-of-type(2)::before { content:"출발공항"; }
+      td:nth-of-type(3)::before { content:"도시명(국가)"; }
+      td:nth-of-type(4)::before { content:"터미널"; }
+      td:nth-of-type(5)::before { content:"입국장"; }
+      td:nth-of-type(6)::before { content:"가까운 주차장"; }
+      td:nth-of-type(7)::before { content:"도착게이트"; }
+      td:nth-of-type(8)::before { content:"예정시간"; }
+      td:nth-of-type(9)::before { content:"실제도착"; }
+    }
+  </style>
 </head>
 <body>
   <header>
-    <h1>인천공항 실시간 도착, 입국장 및 주차장 안내</h1>
+    <h1>
+      <span class="title-line1">인천공항 실시간 도착</span>
+      <span class="title-line2">입국장 및 주차장 안내</span>
+    </h1>
   </header>
 
-  <main>
-    <!-- 여기에 기존 도착/입국장 안내 UI, 주차장 현황 표시 코드 -->
-    <div id="app"></div>
-  </main>
+  <div class="controls">
+    <button id="btnAll">전체</button>
+    <button id="btnT1">제1터미널</button>
+    <button id="btnT2">제2터미널</button>
+  </div>
 
-  <!-- ✅ 스크립트 -->
-  <script src="js/script.js"></script>
+  <div id="status" class="status"></div>
+  <div id="result"></div>
+
+  <script>
+    const RAW_SERVICE_KEY = "f22da3a374e1aae625242ccc43f10c068eacff4a5a249c750a4d48998229a8e6";
+    const SERVICE_KEY = encodeURIComponent(RAW_SERVICE_KEY);
+
+    let parkingMap = {};
+    const destinationCache = {};
+    const airlineCache = {};
+
+    const $ = id => document.getElementById(id);
+    const $status = $("status");
+    const $result = $("result");
+
+    function setStatus(msg, cls="") {
+      $status.className = "status " + cls;
+      $status.textContent = msg;
+    }
+    function fmtTime(s){
+      if(!s || s.length < 12) return s || "";
+      return `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)} ${s.slice(8,10)}:${s.slice(10,12)}`;
+    }
+    function nearestParking(terminal, entrygate){
+      if(!terminal) return "-";
+      const map = parkingMap[terminal] || {};
+      return map[entrygate] || map["default"] || "-";
+    }
+
+    async function getDestinationInfo(airportCode){
+      if(destinationCache[airportCode]) return destinationCache[airportCode];
+      const base="https://apis.data.go.kr/B551177/StatusOfSrvDestinations/getServiceDestinationInfo";
+      const params = new URLSearchParams({ serviceKey: RAW_SERVICE_KEY, airport_code: airportCode, type:"xml" });
+      const url = base+"?"+params.toString().replace(RAW_SERVICE_KEY, SERVICE_KEY);
+      const res = await fetch(url); const text = await res.text();
+      const xml = new DOMParser().parseFromString(text,"application/xml");
+      const item = xml.getElementsByTagName("item")[0];
+      const city = item?.getElementsByTagName("airportName")[0]?.textContent || "";
+      const country = item?.getElementsByTagName("countryName")[0]?.textContent || "";
+      return destinationCache[airportCode] = { cityOnly: city, full: country ? `${city} (${country})` : city };
+    }
+    async function getAirlineInfo(iataCode){
+      if(airlineCache[iataCode]) return airlineCache[iataCode];
+      const base="https://apis.data.go.kr/B551177/StatusOfSrvAirlines/getServiceAirlineInfo";
+      const params = new URLSearchParams({ serviceKey: RAW_SERVICE_KEY, airline_iata: iataCode, type:"xml" });
+      const url = base+"?"+params.toString().replace(RAW_SERVICE_KEY, SERVICE_KEY);
+      const res = await fetch(url); const text = await res.text();
+      const xml = new DOMParser().parseFromString(text,"application/xml");
+      const item = xml.getElementsByTagName("item")[0];
+      const name = item?.getElementsByTagName("airlineName")[0]?.textContent || "";
+      const logo = item?.getElementsByTagName("airlineImage")[0]?.textContent || "";
+      return airlineCache[iataCode] = { name, logo };
+    }
+    async function fetchArrivals(terminalFilter=""){
+      const base="https://apis.data.go.kr/B551177/StatusOfArrivals/getArrivalsCongestion";
+      const params = new URLSearchParams({ serviceKey: RAW_SERVICE_KEY, numOfRows:"100", pageNo:"1", type:"xml" });
+      if(terminalFilter) params.set("terno", terminalFilter);
+      const url = base+"?"+params.toString().replace(RAW_SERVICE_KEY, SERVICE_KEY);
+      const res = await fetch(url); const text = await res.text();
+      const xml = new DOMParser().parseFromString(text, "application/xml");
+      const nodes = xml.getElementsByTagName("item");
+      const rows = [];
+      for (let i=0;i<nodes.length;i++){
+        const n = nodes[i];
+        rows.push({
+          airport: n.getElementsByTagName("airport")[0]?.textContent || "",
+          entrygate: n.getElementsByTagName("entrygate")[0]?.textContent || "",
+          estimatedtime: n.getElementsByTagName("estimatedtime")[0]?.textContent || "",
+          flightid: n.getElementsByTagName("flightid")[0]?.textContent || "",
+          gatenumber: n.getElementsByTagName("gatenumber")[0]?.textContent || "",
+          scheduletime: n.getElementsByTagName("scheduletime")[0]?.textContent || "",
+          terno: (n.getElementsByTagName("terno")[0]?.textContent || "").trim()
+        });
+      }
+      return rows;
+    }
+
+    async function render(rows, summaryCounts){
+      const t1Count = summaryCounts?.t1 ?? rows.filter(r=>r.terno==="T1").length;
+      const t2Count = summaryCounts?.t2 ?? rows.filter(r=>r.terno==="T2").length;
+      const total = (summaryCounts ? (summaryCounts.t1 + summaryCounts.t2) : rows.length);
+      const summaryText = `제1터미널: ${t1Count}편 | 제2터미널: ${t2Count}편 | 전체: ${total}편`;
+
+      let html = `<div class="summary">${summaryText}</div>`;
+      html += `<table>
+        <thead><tr>
+          <th>편명 / 항공사</th><th>출발공항</th><th>도시명 (국가)</th>
+          <th>터미널</th><th>입국장</th><th>가까운 주차장</th>
+          <th>도착게이트</th><th>예정시간</th><th>실제도착</th>
+        </tr></thead><tbody>`;
+
+      for (const it of rows){
+        const airlineInfo = await getAirlineInfo((it.flightid||"").slice(0,2));
+        const destInfo = await getDestinationInfo(it.airport || "");
+        const nearest = nearestParking(it.terno, it.entrygate);
+
+        html += `<tr>
+          <td>
+            <span>${it.flightid||""}</span>
+            ${airlineInfo.logo ? `<img src="${airlineInfo.logo}" class="logo" alt="">` : ""}
+            <span>${airlineInfo.name}</span>
+          </td>
+          <td><span>${it.airport||""}</span><span class="sub">(${destInfo.cityOnly})</span></td>
+          <td>${destInfo.full}</td>
+          <td>${it.terno||""}</td>
+          <td>${it.entrygate||""}</td>
+          <td>${nearest}</td>
+          <td>${it.gatenumber||""}</td>
+          <td class="time">${fmtTime(it.scheduletime||"")}</td>
+          <td class="time">${fmtTime(it.estimatedtime||"")}</td>
+        </tr>`;
+      }
+
+      html += `</tbody></table>`;
+      $result.innerHTML = html;
+    }
+
+    async function autoFetchAll(){
+      setStatus("조회 중…");
+      $result.innerHTML = "";
+      const [rowsT1, rowsT2] = await Promise.all([fetchArrivals("T1"), fetchArrivals("T2")]);
+      const rows = [...rowsT1, ...rowsT2].sort((a,b)=>(a.scheduletime||"").localeCompare(b.scheduletime||""));
+      await render(rows, { t1: rowsT1.length, t2: rowsT2.length });
+      setStatus("조회 완료","ok");
+    }
+    async function autoFetch(terminalFilter){
+      setStatus("조회 중…");
+      $result.innerHTML = "";
+      const rows = await fetchArrivals(terminalFilter);
+      rows.sort((a,b)=>(a.scheduletime||"").localeCompare(b.scheduletime||""));
+      const counts = terminalFilter==="T1" ? {t1: rows.length, t2: 0} : {t1: 0, t2: rows.length};
+      await render(rows, counts);
+      setStatus("조회 완료","ok");
+    }
+
+    $("btnAll").addEventListener("click", autoFetchAll);
+    $("btnT1").addEventListener("click", ()=>autoFetch("T1"));
+    $("btnT2").addEventListener("click", ()=>autoFetch("T2"));
+
+    // init
+    fetch("parkingMap.json").then(r=>r.json()).then(pm=>{ parkingMap=pm; autoFetchAll(); }).catch(()=>autoFetchAll());
+  </script>
 </body>
 </html>
