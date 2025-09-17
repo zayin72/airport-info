@@ -163,6 +163,7 @@
       td:nth-of-type(9)::before { content:"실제도착"; }
     }
   </style>
+
 </head>
 <body>
   <header>
@@ -326,29 +327,28 @@
     오늘 방문: <span id="todayCount">0</span> | 전체 방문: <span id="totalCount">0</span>
   </footer>
 
-  <!-- ✅ 방문자 카운터 스크립트 -->
-  <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      // 전체 방문 카운트
-      fetch("https://api.countapi.xyz/hit/icn-airport-info/total")
-        .then(res => res.json())
-        .then(data => {
-          const el = document.getElementById("totalCount");
-          if (el) el.innerText = data.value;
-        })
-        .catch(e => console.error("totalCount error:", e));
+<!-- ✅ 방문자 카운터 스크립트 (교체본) -->
+<script>
+(function runCounters(){
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  };
 
-      // 오늘 날짜별 방문 카운트
-      const todayKey = new Date().toISOString().slice(0,10);
-      fetch("https://api.countapi.xyz/hit/icn-airport-info/" + todayKey)
-        .then(res => res.json())
-        .then(data => {
-          const el = document.getElementById("todayCount");
-          if (el) el.innerText = data.value;
-        })
-        .catch(e => console.error("todayCount error:", e));
-    });
-  </script>
+  // 전체 카운트 (캐시 무력화)
+  fetch("https://api.countapi.xyz/hit/icn-airport-info/total", { cache: "no-store" })
+    .then(r => r.json())
+    .then(d => set("totalCount", d.value))
+    .catch(e => console.warn("totalCount error:", e));
+
+  // 오늘 카운트 (YYYY-MM-DD 키)
+  const today = new Date().toISOString().slice(0,10);
+  fetch(`https://api.countapi.xyz/hit/icn-airport-info/${today}`, { cache: "no-store" })
+    .then(r => r.json())
+    .then(d => set("todayCount", d.value))
+    .catch(e => console.warn("todayCount error:", e));
+})();
+</script>
 </body>
 </html>
 </body>
