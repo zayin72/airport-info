@@ -322,7 +322,18 @@
     fetch("parkingMap.json").then(r=>r.json()).then(pm=>{ parkingMap=pm; autoFetchAll(); }).catch(()=>autoFetchAll());
   </script>
 
- <!-- ✅ 방문자 카운터 스크립트 (교체본) -->
+ <!-- ✅ 구글 애드센스 -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2436812284329105"
+        crossorigin="anonymous"></script>
+<ins class="adsbygoogle"
+     style="display:inline-block;width:320px;height:100px"
+     data-ad-client="ca-pub-2436812284329105"
+     data-ad-slot="1234567890"></ins>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+<!-- ✅ 방문자 카운터 스크립트 -->
 <script>
 (function runCounters(){
   const set = (id, val) => {
@@ -330,13 +341,13 @@
     if (el) el.textContent = val;
   };
 
-  // 전체 카운트 (캐시 무력화)
+  // 전체 카운트
   fetch("https://api.countapi.xyz/hit/icn-airport-info/total", { cache: "no-store" })
     .then(r => r.json())
     .then(d => set("totalCount", d.value))
     .catch(e => console.warn("totalCount error:", e));
 
-  // 오늘 카운트 (YYYY-MM-DD 키)
+  // 오늘 카운트
   const today = new Date().toISOString().slice(0,10);
   fetch(`https://api.countapi.xyz/hit/icn-airport-info/${today}`, { cache: "no-store" })
     .then(r => r.json())
@@ -344,8 +355,5 @@
     .catch(e => console.warn("todayCount error:", e));
 })();
 </script>
-
-</body>
-</html>
 </body>
 </html>
