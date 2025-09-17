@@ -322,12 +322,7 @@
     fetch("parkingMap.json").then(r=>r.json()).then(pm=>{ parkingMap=pm; autoFetchAll(); }).catch(()=>autoFetchAll());
   </script>
 
-  <!-- ✅ 방문자 카운터 표시 -->
-  <footer style="margin:20px; text-align:center; font-size:14px; color:#333; border-top:1px solid #ddd; padding-top:10px;">
-    오늘 방문: <span id="todayCount">0</span> | 전체 방문: <span id="totalCount">0</span>
-  </footer>
-
-<!-- ✅ 방문자 카운터 스크립트 (교체본) -->
+ <!-- ✅ 방문자 카운터 스크립트 (교체본) -->
 <script>
 (function runCounters(){
   const set = (id, val) => {
@@ -349,5 +344,8 @@
     .catch(e => console.warn("todayCount error:", e));
 })();
 </script>
+
+</body>
+</html>
 </body>
 </html>
