@@ -14,14 +14,14 @@
   <meta property="og:title" content="인천공항 실시간 도착·입국장 안내">
   <meta property="og:description" content="실시간 항공편 도착 현황, 입국장 위치, 가까운 주차장 정보를 빠르게 확인하세요.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://airport-info.netlify.app">
-  <meta property="og:image" content="https://airport-info.netlify.app/images/airport_bg.jpg">
+  <meta property="og:url" content="https://icn-airport-info.netlify.app">
+  <meta property="og:image" content="https://icn-airport-info.netlify.app/images/airport_bg.jpg">
 
   <!-- ✅ Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="인천공항 실시간 도착·입국장 안내">
   <meta name="twitter:description" content="실시간 항공편 도착 현황, 입국장 위치, 가까운 주차장 정보를 빠르게 확인하세요.">
-  <meta name="twitter:image" content="https://airport-info.netlify.app/images/airport_bg.jpg">
+  <meta name="twitter:image" content="https://icn-airport-info.netlify.app/images/airport_bg.jpg">
 
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -47,7 +47,7 @@
   <!-- ✅ 방문자 카운터 스크립트 -->
   <script>
     // 전체 방문 카운트
-    fetch("https://api.countapi.xyz/hit/airport-info/total")
+    fetch("https://api.countapi.xyz/hit/icn-airport-info/total")
       .then(res => res.json())
       .then(data => {
         document.getElementById("totalCount").innerText = data.value;
@@ -55,7 +55,7 @@
 
     // 오늘 날짜별 방문 카운트
     const todayKey = new Date().toISOString().slice(0,10); // ex) 2025-09-17
-    fetch("https://api.countapi.xyz/hit/airport-info/" + todayKey)
+    fetch("https://api.countapi.xyz/hit/icn-airport-info/" + todayKey)
       .then(res => res.json())
       .then(data => {
         document.getElementById("todayCount").innerText = data.value;
